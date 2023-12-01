@@ -14,5 +14,6 @@ public class Account
 
     public bool AccountStatus { get; set; }
 
+    public Role Role { get; set; }
     public virtual ICollection<Transaction> Transactions { get; } = new List<Transaction>();
 }

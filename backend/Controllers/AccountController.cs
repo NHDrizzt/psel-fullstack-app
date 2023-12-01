@@ -1,5 +1,8 @@
 using backend.Models;
 using backend.Repository;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,10 +35,22 @@ public class AccountController : Controller
         return Ok(account);
     }
     
+    
     [HttpPost]
     public async Task<ActionResult<Account>> CreateAccount(Account account)
     {
         await _repository.CreateAccount(account);
         return CreatedAtAction(nameof(GetAllAccounts), new { id = account.Id }, account);
     }
+
+    [HttpPut]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Policy = "RolePolicy")]
+    public async Task<ActionResult> UpdateAccount(Account account)
+    {
+        await _repository.UpdateAccount(account);
+        return NoContent();
+    }
+    
+    
 }

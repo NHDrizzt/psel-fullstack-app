@@ -1,4 +1,5 @@
 using backend.Models;
+using backend.ViewModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repository;
@@ -57,6 +58,38 @@ public class AccountRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred in CreateAccount");
+            throw;
+        }
+    }
+    
+    public async Task<Account> FindUserByEmailAndPassword (LoginModel loginModel)
+    {
+        try
+        {
+            var account = await _context.Account.FirstOrDefaultAsync(x => x.Email == loginModel.Email && x.Password == loginModel.Password);
+            if (account == null)
+            {
+                throw new KeyNotFoundException($"Conta com email ou senha não foi encontrada.");
+            }
+            return account;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred in FindUserByEmailAndPassword");
+            throw;
+        }
+    }
+    
+    public async Task UpdateAccount(Account account)
+    {
+        try
+        {
+            _context.Account.Update(account);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred in UpdateAccount");
             throw;
         }
     }
