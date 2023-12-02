@@ -12,9 +12,9 @@ namespace backend.Controllers;
 public class AuthController : Controller
 {
     
-    private readonly AccountRepository _repository;
+    private readonly IAccountRepository _repository;
     
-    public AuthController(AccountRepository repository)
+    public AuthController(IAccountRepository repository)
     {
         _repository = repository;
     }

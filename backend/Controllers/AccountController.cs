@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace backend.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/account")]
 public class AccountController : Controller
 {
 
@@ -55,6 +55,8 @@ public class AccountController : Controller
     }
     
     [HttpDelete("{id}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     public async Task<ActionResult> DeleteAccount(int id)
     {
         await _accountService.DeleteAccount(id);
