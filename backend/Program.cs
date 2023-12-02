@@ -34,7 +34,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RolePolicy", policy => policy.RequireClaim(ClaimTypes.Role, "User"));
+    options.AddPolicy("RolePolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
 });
 
 builder.Services.AddScoped<FinancialDbContext>();

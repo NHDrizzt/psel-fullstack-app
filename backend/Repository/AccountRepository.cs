@@ -1,3 +1,4 @@
+using backend.DTO;
 using backend.Models;
 using backend.ViewModel;
 using Microsoft.EntityFrameworkCore;
@@ -80,18 +81,53 @@ public class AccountRepository
         }
     }
     
-    public async Task UpdateAccount(Account account)
+    public async Task UpdateAccount(int id, AccountDto account)
     {
         try
         {
+            var existingAccount = await _context.Account.FindAsync(id);
+            if (existingAccount == null)
+            {
+                throw new KeyNotFoundException($"Conta com id {id} não foi encontrada.");
+            }
+            
+            _context.Entry(existingAccount).CurrentValues.SetValues(account);
+            await _context.SaveChangesAsync();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogError(ex, "Error occurred in UpdateAccount");
+            throw new KeyNotFoundException($"Não foi possível encontrar a conta com id {id}.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred in UpdateAccount");
+            throw new Exception("Não foi possível atualizar a conta.");
+        }
+    }
+
+    public async Task DeleteAccount(int id)
+    {
+        try
+        {
+            var account = await _context.Account.FirstOrDefaultAsync(x => x.Id == id);
+            if (account == null)
+            {
+                throw new KeyNotFoundException($"Conta com ID {id} não foi encontrada.");
+            }
+
+            if (!account.AccountStatus)
+            {
+                throw new Exception($"Conta com ID {id} já está desativada.");
+            }
+            account.AccountStatus = false;
             _context.Account.Update(account);
             await _context.SaveChangesAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred in UpdateAccount");
+            _logger.LogError(ex, "Error occurred in DeleteAccount");
             throw;
         }
     }
-
 }

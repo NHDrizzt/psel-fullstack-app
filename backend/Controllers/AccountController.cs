@@ -1,3 +1,4 @@
+using backend.DTO;
 using backend.Models;
 using backend.Repository;
 using Microsoft.AspNetCore.Authentication;
@@ -43,12 +44,19 @@ public class AccountController : Controller
         return CreatedAtAction(nameof(GetAllAccounts), new { id = account.Id }, account);
     }
 
-    [HttpPut]
+    [HttpPut ("{id}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Authorize(Policy = "RolePolicy")]
-    public async Task<ActionResult> UpdateAccount(Account account)
+    public async Task<ActionResult> UpdateAccount(int id, AccountDto accountDto)
     {
-        await _repository.UpdateAccount(account);
+        await _repository.UpdateAccount(id, accountDto);
+        return NoContent();
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAccount(int id)
+    {
+        await _repository.DeleteAccount(id);
         return NoContent();
     }
     

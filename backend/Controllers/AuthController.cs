@@ -38,7 +38,7 @@ public class AuthController : Controller
                 return BadRequest("Conta desativada.");
             }
 
-            if (accountViewModel.Account.Role != Role.User)
+            if (accountViewModel.Account.Role != Role.Admin)
             {
                 return BadRequest("Conta não autorizada");
             }
