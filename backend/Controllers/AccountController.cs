@@ -1,6 +1,7 @@
 using backend.DTO;
 using backend.Models;
 using backend.Repository;
+using backend.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -13,18 +14,18 @@ namespace backend.Controllers;
 [Route("[controller]")]
 public class AccountController : Controller
 {
+
+    private readonly IAccountService _accountService;
     
-    private readonly AccountRepository _repository;
-    
-    public AccountController(AccountRepository repository)
+    public AccountController(IAccountService accountService)
     {
-        _repository = repository;
+        _accountService = accountService;
     }
     
     [HttpGet]
     public async Task<ActionResult<List<Account>>> GetAllAccounts()
     {
-        var account = await _repository.GetAllAccounts();
+        var account = await _accountService.GetAllAccounts();
 
         return Ok(account);
     }
@@ -32,31 +33,31 @@ public class AccountController : Controller
     [HttpGet("{id}")]
     public async Task<ActionResult<Account>> GetAccountById(int id)
     { 
-        var account = await _repository.GetAccountById(id);
+        var account = await _accountService.GetAccountById(id);
         return Ok(account);
     }
     
     
     [HttpPost]
-    public async Task<ActionResult<Account>> CreateAccount(Account account)
+    public async Task<ActionResult<Account>> CreateAccount([FromBody] Account account)
     {
-        await _repository.CreateAccount(account);
+        await _accountService.CreateAccount(account);
         return CreatedAtAction(nameof(GetAllAccounts), new { id = account.Id }, account);
     }
 
     [HttpPut ("{id}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Authorize(Policy = "RolePolicy")]
-    public async Task<ActionResult> UpdateAccount(int id, AccountDto accountDto)
+    public async Task<ActionResult> UpdateAccount(int id, [FromBody] AccountDto accountDto)
     {
-        await _repository.UpdateAccount(id, accountDto);
+        await _accountService.UpdateAccount(id, accountDto);
         return NoContent();
     }
     
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAccount(int id)
     {
-        await _repository.DeleteAccount(id);
+        await _accountService.DeleteAccount(id);
         return NoContent();
     }
     

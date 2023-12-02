@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repository;
 
-public class AccountRepository
+public class AccountRepository : IAccountRepository
 {
     private readonly FinancialDbContext _context;
     

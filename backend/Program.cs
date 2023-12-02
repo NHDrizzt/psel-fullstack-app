@@ -3,6 +3,7 @@ using System.Text;
 using backend.Constants;
 using backend.Models;
 using backend.Repository;
+using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -38,7 +39,8 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<FinancialDbContext>();
-builder.Services.AddScoped<AccountRepository>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
