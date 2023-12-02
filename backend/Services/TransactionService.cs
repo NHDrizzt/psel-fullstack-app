@@ -83,4 +83,40 @@ public class TransactionService : ITransactionService
             throw;
         }
     }
+    
+    
+    public async Task<List<TransactionDto>> GetTransactions(int accountId)
+    {
+        try
+        {
+            var account = await _accountRepository.GetAccountById(accountId);
+            var transactions = await _transactionRepository.GetTransactions();
+            
+            if (account == null)
+            {
+                throw new KeyNotFoundException($"Conta com ID {accountId} não foi encontrada.");
+            }
+            
+            if(!account.AccountStatus )
+            {
+                throw new Exception($"Conta com ID {accountId} está inativa.");
+            }
+            
+            transactions = transactions.Where(t => t.IdAccount == accountId).ToList();
+
+            return transactions.Select(t => new TransactionDto
+            {
+                IdTransaction = t.IdTransaction,
+                IdAccount = t.IdAccount,
+                TransactionData = t.TransactionData,
+                Value = t.Value,
+                Cashback = t.Cashback
+            }).ToList();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

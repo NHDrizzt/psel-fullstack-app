@@ -51,4 +51,18 @@ public class TransactionRepository : ITransactionRepository
             throw;
         }
     }
+    
+    public async Task<List<Transactions>> GetTransactions()
+    {
+        try
+        {
+            var transactions = await _context.Transactions.ToListAsync();
+            return transactions;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred in GetTransactions");
+            throw;
+        }
+    }
 }

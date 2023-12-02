@@ -23,9 +23,7 @@ public class TransactionController : ControllerBase
     [Authorize]
     public async Task<ActionResult> RegisterPayment(RegisterPaymentDto registerPaymentDto)
     {
-        
         var idTransaction = await _transactionService.RegisterPayment(registerPaymentDto);
-        
         return Ok(new { transactionId = idTransaction });
     }
     
@@ -35,6 +33,14 @@ public class TransactionController : ControllerBase
     {
         await _transactionService.RegisterCashback(registerCashbackDto);
         return StatusCode(201);
+    }
+    
+    [HttpGet("{id}")]
+    [Authorize]
+    public async Task<ActionResult<List<TransactionDto>>> GetTransactions(int id)
+    {
+        var transactions = await _transactionService.GetTransactions(id);
+        return Ok(transactions);
     }
     
 }

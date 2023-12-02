@@ -8,4 +8,6 @@ public interface ITransactionRepository
     Task<int> RegisterPayment(Transactions transactions);
     
     Task<Transactions> GetTransactionById(int id);
+    
+    Task<List<Transactions>> GetTransactions();
 }
