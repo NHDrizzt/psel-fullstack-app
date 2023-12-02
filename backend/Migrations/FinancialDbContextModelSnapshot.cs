@@ -85,7 +85,7 @@ namespace backend.Migrations
                     b.ToTable("Cashback", (string)null);
                 });
 
-            modelBuilder.Entity("backend.Models.Transaction", b =>
+            modelBuilder.Entity("backend.Models.Transactions", b =>
                 {
                     b.Property<int>("IdTransaction")
                         .ValueGeneratedOnAdd()

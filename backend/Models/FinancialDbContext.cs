@@ -19,7 +19,7 @@ public partial class FinancialDbContext : DbContext
 
     public virtual DbSet<Account> Account { get; set; }
 
-    public virtual DbSet<Transaction> Transactions { get; set; }
+    public virtual DbSet<Transactions> Transactions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -44,7 +44,7 @@ public partial class FinancialDbContext : DbContext
 
             entity.Property(e => e.TaxCashback).HasColumnType("decimal(5, 4)");
 
-            entity.HasOne(d => d.IdTransactionNavigation).WithMany(p => p.Cashbacks)
+            entity.HasOne(d => d.IdTransactionsNavigation).WithMany(p => p.Cashbacks)
                 .HasForeignKey(d => d.IdTransaction)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Cashback__IdTran__3C69FB99");
@@ -62,11 +62,11 @@ public partial class FinancialDbContext : DbContext
             entity.Property(e => e.Password).HasMaxLength(255);
         });
 
-        modelBuilder.Entity<Transaction>(entity =>
+        modelBuilder.Entity<Transactions>(entity =>
         {
             entity.HasKey(e => e.IdTransaction).HasName("PK__Transact__D44F6292EA3C151D");
 
-            entity.ToTable("Transaction");
+            entity.ToTable("Transactions");
 
             entity.Property(e => e.Cashback).HasColumnType("decimal(5, 4)");
             entity.Property(e => e.TransactionData).HasColumnType("datetime");

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace backend.Models;
 
-public class Transaction
+public class Transactions
 {
     public int IdTransaction { get; set; }
 

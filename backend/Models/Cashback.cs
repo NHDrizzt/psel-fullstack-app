@@ -11,5 +11,5 @@ public class Cashback
 
     public decimal TaxCashback { get; set; }
 
-    public virtual Transaction IdTransactionNavigation { get; set; } = null!;
+    public virtual Transactions IdTransactionsNavigation { get; set; } = null!;
 }
