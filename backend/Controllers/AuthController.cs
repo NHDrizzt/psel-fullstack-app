@@ -8,7 +8,7 @@ namespace backend.Controllers;
 
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/auth")]
 public class AuthController : Controller
 {
     

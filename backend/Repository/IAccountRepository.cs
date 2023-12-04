@@ -12,4 +12,6 @@ public interface IAccountRepository
     Task UpdateAccount(int id, AccountDto accountDto);
     Task DeleteAccount(int id);
     Task<Account> FindUserByEmailAndPassword(LoginModel loginModel);
+    
+    Task<bool> FindEmailIfExists(string email);
 }

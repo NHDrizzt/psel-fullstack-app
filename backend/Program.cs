@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using System.Text;
 using backend.Constants;
+using backend.Exceptions;
 using backend.Models;
 using backend.Repository;
 using backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -38,6 +40,14 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RolePolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 builder.Services.AddScoped<FinancialDbContext>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
@@ -58,6 +68,27 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+
+        var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+        if (contextFeature != null)
+        {
+            await context.Response.WriteAsync(new ErrorDetails
+            {
+                StatusCode = context.Response.StatusCode,
+                Message = contextFeature.Error.Message
+            }.ToString());
+        }
+    });
+    
+    
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -65,5 +96,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseAuthorization();
+
+app.UseCors("AllowSpecificOrigin");
 
 app.Run();

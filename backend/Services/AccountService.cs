@@ -1,6 +1,8 @@
 using backend.DTO;
+using backend.Exceptions;
 using backend.Models;
 using backend.Repository;
+using backend.ViewModel;
 
 namespace backend.Services;
 
@@ -25,6 +27,11 @@ public class AccountService : IAccountService
     
     public async Task CreateAccount(Account account)
     {
+        var accountExists = await _accountRepository.FindEmailIfExists(account.Email);
+        if (accountExists)
+        {
+            throw new AccountExistsException("Conta já existe com esse email");
+        }
         await _accountRepository.CreateAccount(account);
     }
     

@@ -80,6 +80,24 @@ public class AccountRepository : IAccountRepository
             throw;
         }
     }
+
+    public async Task<bool> FindEmailIfExists(string email)
+    {
+        try
+        {
+            var account = await _context.Account.FirstOrDefaultAsync(x => x.Email == email);
+            if (account == null)
+            {
+                return false;
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
     
     public async Task UpdateAccount(int id, AccountDto account)
     {

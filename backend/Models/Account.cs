@@ -15,7 +15,7 @@ public class Account
 
     public string Password { get; set; } = null!;
 
-    public bool AccountStatus { get; set; }
+    public bool AccountStatus { get; set; } = true;
 
     public Role Role { get; set; }
     public virtual ICollection<Transactions> Transactions { get; } = new List<Transactions>();
