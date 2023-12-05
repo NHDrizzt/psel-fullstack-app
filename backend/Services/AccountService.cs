@@ -27,11 +27,13 @@ public class AccountService : IAccountService
     
     public async Task CreateAccount(Account account)
     {
-        var accountExists = await _accountRepository.FindEmailIfExists(account.Email);
-        if (accountExists)
+        
+        var errors = await _accountRepository.ValidateAccount(account);
+        if (errors.Count > 0)
         {
-            throw new AccountExistsException("Conta já existe com esse email");
+            throw new AccountExistsException(errors);
         }
+        
         await _accountRepository.CreateAccount(account);
     }
     

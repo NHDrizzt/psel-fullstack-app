@@ -1,4 +1,5 @@
 using backend.DTO;
+using backend.Exceptions;
 using backend.Models;
 using backend.ViewModel;
 using Microsoft.EntityFrameworkCore;
@@ -98,7 +99,46 @@ public class AccountRepository : IAccountRepository
             throw;
         }
     }
-    
+
+    public async Task<List<ErrorDetails>> ValidateAccount(Account account)
+    {
+        List<ErrorDetails> errors = new List<ErrorDetails>();
+        var accountExists = await _context.Account
+            .AnyAsync(a => a.Email == account.Email || a.CpfCnpj == account.CpfCnpj || a.Name == account.Name);
+
+        if (accountExists)
+        {
+            if (await _context.Account.AnyAsync(a => a.Email == account.Email))
+            {
+                errors.Add(new ErrorDetails(
+                    409,
+                    "Conta já existe com esse email",
+                    "EmailExists"
+                ));
+            }
+        
+            if (await _context.Account.AnyAsync(a => a.CpfCnpj == account.CpfCnpj))
+            {
+                errors.Add(new ErrorDetails(
+                    409,
+                    "Conta já existe com esse CPF/CNPJ",
+                    "CpfCnpjExists"
+                ));
+            }
+
+            if (await _context.Account.AnyAsync(a => a.Name == account.Name))
+            {
+                errors.Add(new ErrorDetails(
+                    409,
+                    "Conta já existe com esse nome",
+                    "NameExists"
+                ));
+            }
+        }
+
+        return errors;
+    }
+     
     public async Task UpdateAccount(int id, AccountDto account)
     {
         try

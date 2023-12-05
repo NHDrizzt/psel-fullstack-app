@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using backend.Constants;
 using backend.Exceptions;
 using backend.Models;
@@ -72,21 +73,22 @@ app.UseExceptionHandler(appError =>
 {
     appError.Run(async context =>
     {
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        context.Response.ContentType = "application/json";
-
         var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
         if (contextFeature != null)
         {
-            await context.Response.WriteAsync(new ErrorDetails
+            var error = contextFeature.Error;
+            var apiErrors = error switch
             {
-                StatusCode = context.Response.StatusCode,
-                Message = contextFeature.Error.Message
-            }.ToString());
+                AccountExistsException ex => ex.ErrorTypes,
+                _ => new List<ErrorDetails> { new ErrorDetails(StatusCodes.Status500InternalServerError, "Internal Server Error") }
+            };
+
+            context.Response.StatusCode = apiErrors.First().StatusCode;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(JsonSerializer.Serialize(apiErrors));
+            
         }
     });
-    
-    
 });
 
 app.UseHttpsRedirection();

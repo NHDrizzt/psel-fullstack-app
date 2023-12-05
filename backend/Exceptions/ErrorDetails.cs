@@ -6,9 +6,13 @@ public class ErrorDetails
 {
     public int StatusCode { get; set; }
     public string Message { get; set; }
-
-    public override string ToString()
+    
+    public string ErrorType { get; set; }
+    
+    public ErrorDetails(int statusCode, string message, string errorType = null)
     {
-        return JsonSerializer.Serialize(this);
+        StatusCode = statusCode;
+        Message = message;
+        ErrorType = errorType;
     }
 }

@@ -1,4 +1,5 @@
 using backend.DTO;
+using backend.Exceptions;
 using backend.Models;
 using backend.ViewModel;
 
@@ -14,4 +15,6 @@ public interface IAccountRepository
     Task<Account> FindUserByEmailAndPassword(LoginModel loginModel);
     
     Task<bool> FindEmailIfExists(string email);
+
+    Task<List<ErrorDetails>> ValidateAccount(Account account);
 }

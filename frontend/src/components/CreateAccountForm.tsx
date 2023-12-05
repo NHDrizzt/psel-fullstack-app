@@ -1,15 +1,33 @@
 'use client';
-import React from 'react';
+import React, {useState} from 'react';
 import {variables} from "@/constants/variables";
 import {useRouter} from "next/navigation";
 import useUser from "@/hooks/useUser";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
+
+interface ApiError {
+    StatusCode: number;
+    Message: string;
+    ErrorType: string;
+}
+
+interface ErrorBackend {
+    EmailExists?: string;
+    CpfCnpjExists?: string;
+    NameExists?: string;
+}
 
 
 interface CreateAccountFormProps {
     setIsCreateAccountActive: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface ErrorKeyMap {
+    [key: string]: keyof ErrorBackend;
+}
 const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ setIsCreateAccountActive }) => {
+    const [errors, setErrors] = useState<ErrorBackend>({});
 
     const router = useRouter();
     const userContext = useUser();
@@ -24,24 +42,52 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ setIsCreateAccoun
             password: formData.get('password') as string,
         };
 
+        let isSuccess = false;
+
        const data = await fetch(variables.API_URL+'/account', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(accountValues)
         })
-            .then(response => {
+           .then(response => {
                 if (!response.ok || response.status !== 201) {
                     throw response;
                 }
                 return response.json();
             })
-            .catch(async errorResponse => {
-                const error = await errorResponse.json();
-                console.error('Erro ao criar conta:', error.Message);
-            });
-
-            userContext.createAccount(data);
+           .catch(async (error) => {
+               const errorStream = await error.json();
+               let errorObject: { [key: string]: string } = {};
+               errorStream.forEach((error: ApiError) => {
+                   errorObject[error.ErrorType] = error.Message;
+               })
+               setErrors(errorObject)
+           })
+        userContext.createAccount(data);
+        isSuccess = true;
+        setErrors(errors => {
+            if (isSuccess && Object.values(errors).every(val => val === "")) {
+                setIsCreateAccountActive(false);
+                return errors;
+            }
+            return errors;
+        });
     };
+
+    const errorKeyMap: ErrorKeyMap  = {
+        email: 'EmailExists',
+        cpfCnpj: 'CpfCnpjExists',
+        name: 'NameExists'
+    };
+
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+
+        const errorKey = errorKeyMap[name];
+        if (errorKey) {
+            setErrors({...errors, [errorKey]: ''});
+        }}
 
     return (
         <form className="border-2 shadow-lg rounded-sm p-6 space-y-2" onSubmit={handleCreateAccount}>
@@ -54,7 +100,9 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ setIsCreateAccoun
                     placeholder="Ex: 12345678910"
                     name="cpfCnpj"
                     autoFocus={true}
+                    onChange={handleChange}
                 />
+                {errors?.CpfCnpjExists && <p className="text-red-500 text-xs">{errors.CpfCnpjExists}</p>}
             </div>
             <div className="space-y-1">
                 <label htmlFor="">Nome</label>
@@ -62,7 +110,10 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ setIsCreateAccoun
                     className="border-2 w-full rounded-sm pl-1 border-gray-400 outline-none"
                     type="text"
                     name="name"
+                    onChange={handleChange}
                 />
+                {errors?.NameExists && <p className="text-red-500 text-xs">{errors.NameExists}</p>}
+
             </div>
             <div className="space-y-1">
                 <label htmlFor="">Email</label>
@@ -70,13 +121,15 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ setIsCreateAccoun
                     className="border-2 w-full rounded-sm pl-1 border-gray-400 outline-none"
                     type="email"
                     name="email"
+                    onChange={handleChange}
                 />
+                {errors?.EmailExists && <p className="text-red-500 text-xs">{errors.EmailExists}</p>}
             </div>
             <div className="space-y-1 pb-2">
                 <label htmlFor="">Senha</label>
                 <input
                     className="border-2 w-full rounded-sm pl-1 border-gray-400 outline-none"
-                    type="text"
+                    type="password"
                     name="password"
                 />
             </div>
